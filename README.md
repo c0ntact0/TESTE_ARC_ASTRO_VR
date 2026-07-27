@@ -1,4 +1,4 @@
-# Testes arcAstroVR
+# Testes arcAstroVR (Source code)
 
 Versão Unity: 6000.4.7f1
 Versão Stellarium: 26.2
@@ -12,7 +12,7 @@ RAM: 16 GB
 - Criado um novo projeto Unity (URP) com o nome TESTE_ARC_ASTRO_VR;
 - Download do repositório em https://github.com/arcAstroVR/arcAstroVR/tree/master;
 
-A partir daqui foram usadas as instruções da secção **Get & build the code** do README do repositório GitHub do arcAstroVR
+A partir daqui foram usadas as instruções da secção **[Get & build the code](https://github.com/arcAstroVR/arcAstroVR/tree/master#get--build-the-code)** do README do repositório GitHub do arcAstroVR.
 
 ## Asset installation
 
@@ -41,7 +41,30 @@ Foi feito um restart ao Unity.
 
 > Assets/TutorialInfo/Scripts/Readme.cs(4,14): error CS0101: The namespace '<global namespace>' already contains a definition for 'Readme'
 
-A classe declarada no script `Assets/TutorialInfo/Scripts/Readme.cs` estava em conflito com a classe declarada em 
+A classe declarada no script `Assets/TutorialInfo/Scripts/Readme.cs` estava em conflito com a classe declarada em `Assets/3rdPerson+Fly/Scripts/Readme.cs` e esta última foi comentada.
+
+---
+> Assets/arcAstroVR/Script/aAV_Direction.cs(10,7): error CS0246: The type or namespace name 'TriLibCore' could not be found (are you missing a using directive or an assembly reference?)
+
+> Assets/arcAstroVR/Script/aAV_FileSet.cs(496,22): error CS0246: The type or namespace name 'AssetLoaderContext' could not be found (are you missing a using directive or an assembly reference?)
+
+> Assets/arcAstroVR/Script/aAV_FileSet.cs(24,10): error CS0246: The type or namespace name 'HumanoidAvatarMapper' could not be found (are you missing a using directive or an assembly reference?)
+
+TODO: Existem vários erros destes derivados da não instalação do Asset TriLib. Ver o que fazer com os monitores.
+
+---
+
+> Assets/arcAstroVR/Script/aAV_Lines.cs(11,18): warning CS0108: 'aAV_Lines.camera' hides inherited member 'Component.camera'. Use the new keyword if hiding was intended.
+
+Em versões antigas do Unity, `Component` tinha um membro chamado `camera`. A variável privada com o mesmo nome está a escondê-lo. A variável foi renomeada para `cameraPosition`.
 
 
+# Testes arcAstroVR (App)
 
+## Instalação
+
+Foram seguidas as instruções da secção **[Installation Instructions & Quick Start](https://github.com/arcAstroVR/arcAstroVR/tree/master#installation-instructions--quick-start)** do README do repositório GitHub do arcAstroVR.
+
+- Feito o download da versão para Mac (silicon);
+- Feito o download do dataset **[Yoshinogari all area 2025](https://arcastrovr.org/download/data_yoshinogari2025.zip)**;
+- No ponto 4-17. do README, os autores pedem para se mudar a path da `Screenshot Directory` para `/Users/<USERNAME>/Library/Application Support/Stellarium` (MacOS). No entanto, para ser menos intrusivo na configuração do Stellarium, criei um novo script para executar o Stellarium e configurar a variável de ambiente `STEL_SKYBOX_DIR`. Desta forma a configuração para os teste do Stellarium-Unity e do arcAstroVR permanecem as mesmas;

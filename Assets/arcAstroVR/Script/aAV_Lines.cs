@@ -8,7 +8,7 @@ public class aAV_Lines : MonoBehaviour
 	public GameObject endMarker;
 	public Vector3 endAngle = new Vector3(0f,0f,0f);
 
-	private Vector3 camera = new Vector3(0f,0f,0f);
+	private Vector3 cameraPosition = new Vector3(0f,0f,0f);
 	private Vector3 mapPos = new Vector3(0f,0f,0f);
 	private Vector3 startPos = new Vector3(0f,0f,0f);
 	private Vector3 endPos = new Vector3(0f,0f,0f);
@@ -34,7 +34,7 @@ public class aAV_Lines : MonoBehaviour
 				gameObject.GetComponent<LineRenderer>().enabled = false;
 			}else{
 				gameObject.GetComponent<LineRenderer>().enabled = true;
-				camera = Camera.main.gameObject.transform.position;
+				cameraPosition = Camera.main.gameObject.transform.position;
 				startPos = startMarker.transform.position;
 				if(endMarker){
 					endPos = endMarker.transform.position;
@@ -42,8 +42,8 @@ public class aAV_Lines : MonoBehaviour
 					endPos = startPos+endAngle;
 				}
 				// 垂線座標の取得
-				footPos = startPos + Vector3.Project(camera - startPos, endPos - startPos);
-				scale = Vector3.Distance(camera, footPos)/1000;
+				footPos = startPos + Vector3.Project(cameraPosition - startPos, endPos - startPos);
+				scale = Vector3.Distance(cameraPosition, footPos)/1000;
 				
 				if(!aAV_Public.showCompass){	//通常表示
 					//start側の線の太さ
