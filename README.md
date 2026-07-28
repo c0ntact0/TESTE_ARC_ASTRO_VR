@@ -67,4 +67,43 @@ Foram seguidas as instruções da secção **[Installation Instructions & Quick 
 
 - Feito o download da versão para Mac (silicon);
 - Feito o download do dataset **[Yoshinogari all area 2025](https://arcastrovr.org/download/data_yoshinogari2025.zip)**;
-- No ponto 4-17. do README, os autores pedem para se mudar a path da `Screenshot Directory` para `/Users/<USERNAME>/Library/Application Support/Stellarium` (MacOS). No entanto, para ser menos intrusivo na configuração do Stellarium, criei um novo script para executar o Stellarium e configurar a variável de ambiente `STEL_SKYBOX_DIR`. Desta forma a configuração para os teste do Stellarium-Unity e do arcAstroVR permanecem as mesmas;
+- No ponto 4-17. do README, os autores pedem para se mudar a path da `Screenshot Directory` para `/Users/<USERNAME>/Library/Application Support/Stellarium` (MacOS). No entanto, para ser menos intrusivo na configuração do Stellarium, criei um novo script para executar o Stellarium e configurar a variável de ambiente `STEL_SKYBOX_DIR`. Desta forma a configuração para os teste do Stellarium-Unity e do arcAstroVR permanecem as mesmas.
+
+# Teste terrain4aAVR/QGIS
+
+## Observações ao manual
+
+### Secção 5-1
+- Os URLs corretos para usar na conexao XYZ Tiles para o GoogleMaps são:
+    - Google Satellite: `https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}`;
+    - Google Hybrid: `https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}`;
+    - Google Maps: `https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}`;
+    - Google Terrain: `https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}`.
+
+Os links da Jaxa referidos no manual estão desatualizados. Pedi ajuda ao ChatGPT. Este sugeriu usar dados da Direção Geral do Território.
+
+- Instalei o plugin **DGT CDD Downloader** no QGIS;
+- Criei conta em https://cdd.dgterritorio.gov.pt/;
+- No QGIS, em `Project -> Properties... -> CRS` selecionei:
+    ```
+    ETRS89 / Portugal TM06
+    EPSG:3763
+    ```
+- No QGIS, em `Project -> Properties... -> General` confirmei:
+    ```
+    Units for distance: Meters
+    Units for area: Square meters
+    ```
+- Para descarregar o MDT local:
+    
+    - No QGIS, `Processing -> Toolbox`;
+    - Procurar por `DGT CDD Portal`, expandir e clicar duas vezes em `DGT CDD Data Downloader`;
+    - O objetivo neste teste é o Cromeleque dos Almendres. Defini no mapa (QGIS) na layer do GoogleMaps, uma área de +/- 10 Km à volda do cromeleque;
+    ![](images_readme/Screenshot%202026-07-28%20at%2014.56.23.png)
+    - Em `Collections to download` escolhi MDT-2m
+
+
+WORK IN PROGRESS
+
+
+
