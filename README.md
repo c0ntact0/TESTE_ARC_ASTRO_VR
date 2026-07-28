@@ -80,7 +80,7 @@ Foram seguidas as instruções da secção **[Installation Instructions & Quick 
     - Google Maps: `https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}`;
     - Google Terrain: `https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}`.
 
-Os links da Jaxa referidos no manual estão desatualizados. Pedi ajuda ao ChatGPT. Este sugeriu usar dados da Direção Geral do Território.
+Os links da Jaxa referidos no manual estão desatualizados. Pedi ajuda ao ChatGPT. Este sugeriu usar dados da Direção Geral do Território e Copernicus GLO-30.
 
 - Instalei o plugin **DGT CDD Downloader** no QGIS;
 - Criei conta em https://cdd.dgterritorio.gov.pt/;
