@@ -85,6 +85,9 @@ Foram seguidas as instruções da secção **[Installation Instructions & Quick 
 Os links da Jaxa referidos no manual estão desatualizados. Pedi ajuda ao ChatGPT. Este sugeriu usar dados da Direção Geral do Território e Copernicus GLO-30.
 
 ### Tentativa de criação de um *terrain*
+
+Localização: `38.5575, -8.0614` (Cromeleque dos Almendres)
+
 - Instalei o plugin **DGT CDD Downloader** no QGIS;
 - Criei conta em https://cdd.dgterritorio.gov.pt/;
 - No QGIS, em `Project -> Properties... -> CRS` selecionei:
@@ -97,49 +100,96 @@ Os links da Jaxa referidos no manual estão desatualizados. Pedi ajuda ao ChatGP
     Units for distance: Meters
     Units for area: Square meters
     ```
-- Para descarregar o MDT local:
+#### Para descarregar o MDT local:
     
-    - No QGIS, `Processing -> Toolbox`;
-    - Procurar por `DGT CDD Portal`, expandir e clicar duas vezes em `DGT CDD Data Downloader`;
-    - O objetivo neste teste é o Cromeleque dos Almendres. Defini no mapa (QGIS) na layer do GoogleMaps, uma área de +/- 10 Km à volda do cromeleque;
-    ![](images_readme/Screenshot%202026-07-28%20at%2014.56.23.png)
-    - Em `Area of Interest`escolhi `Use Current Map Canvas Extend`;
-    - Em `Collections to download` escolhi `MDT-2m`;
-- Preparar o DEM amplo
-    - Criei conta https://dataspace.copernicus.eu/ e selecionei `I am also interested in accessing Copernicus Contributing Missions data`;
-    - Entrei no [Copernico Browser](https://browser.dataspace.copernicus.eu/?zoom=16&lat=38.5575&lng=-8.0614&themeId=DEFAULT-THEME&visualizationUrl=U2FsdGVkX1%2FUV8Ogx0%2Bj5XzGfgPa%2FZ%2F3HuiGFUIV3tI1RyokZFAy45fQT4aGMP1yBLBO%2Bp8SMuE6e18UWrmujAQSrd%2BBL5fX3qzbacdXWoj4BSzExH6es3cK3qpjmcSI&datasetId=S2_L2A_CDAS&demSource3D=%22MAPZEN%22&cloudCoverage=30&dateMode=SINGLE), inseri as coordenadas do cromeleque na caixa de pesquisa (38.5575, -8.0614);
-    - No painel de pesquisa (do lado esquerdo), escolhi `Copernicus DEM -> Global Coverage -> COP-DEM_GLO-30-DGED`; 
-    - Fiz zoom até ter +/- 150 Km para cada lado a partir do cromeleque, i.e. uma extensão de +/- 300 Km;
-    - Mudei o ano inicial da pesquisa para 2001-01-01;
-    - Cliquei em Search no fundo do painel;
-    - Para cada resultado fiz download do ficheiro ZIP;
-    - Descompactei todos os ZIP para uma pasta;
-    - Copiei os TIFF localizados nas pastas `<pasta extraida do zip>/Copernicus_DSM_10_N38_00_W009_00/DEM` para uma outra pasta, e.g. pasta `rasters`;
-    - No QGIS, em `Layer -> Add Layer -> Add Raster Layer` selecionei todos os TIFF da pasta `rasters` e pressionei `Add`;
-    - No QGIS, em `Raster -> Miscellaneous -> Build Virtual Raster` configurei:
-        ```
-        Input layers: todos os GeoTIFF GLO-30
-        Place each input file into a separate band: desativado
-        Resolution: Average
-        Output: almendres_glo30.vrt
-        ```
-        ![Aspeto do VTR](images_readme/Screenshot%202026-07-29%20at%2014.16.58.png)
-    - Para converter para GeoTIFF (compatível com **terrain4aAVR**), no QGIS, em `Raster -> Conversion -> Translate (Convert Format)` configurei:
-        ```
-        Input layer: almendres_glo30.vrt
-        Output file: almendres_glo30_merged.tif
-        ```
-        Nas opções de criação, em `Advanced Parameters -> Additional creation options`adicionei:
-        ```
-        COMPRESS=DEFLATE
-        TILED=YES
-        BIGTIFF=IF_SAFER
-        ``` 
+- No QGIS, `Processing -> Toolbox`;
+- Procurar por `DGT CDD Portal`, expandir e clicar duas vezes em `DGT CDD Data Downloader`;
+- O objetivo neste teste é o Cromeleque dos Almendres. Defini no mapa (QGIS) na layer do GoogleMaps,uma área de +/- 10 Km à volda do cromeleque;
+![](images_readme/Screenshot%202026-07-28%20at%2014.56.23.png)
+- Em `Area of Interest`escolhi `Use Current Map Canvas Extend`;
+- Em `Collections to download` escolhi `MDT-2m`;
+#### Preparar o DEM amplo
+- Criei conta https://dataspace.copernicus.eu/ e selecionei `I am also interested in accessing Copernicus Contributing Missions data`;
+- Entrei no [Copernico Browser](https://browser.dataspace.copernicus.eu/?zoom=16&lat=38.5575&lng=-8.0614&themeId=DEFAULT-THEME&visualizationUrl=U2FsdGVkX1%2FUV8Ogx0%2Bj5XzGfgPa%2FZ%2F3HuiGFUIV3tI1RyokZFAy45fQT4aGMP1yBLBO%2Bp8SMuE6e18UWrmujAQSrd%2BBL5fX3qzbacdXWoj4BSzExH6es3cK3qpjmcSI&datasetId=S2_L2A_CDAS&demSource3D=%22MAPZEN%22&cloudCoverage=30&dateMode=SINGLE), inseri as coordenadas do cromeleque na caixa de pesquisa (38.5575, -8.0614);
+- No painel de pesquisa (do lado esquerdo), escolhi `Copernicus DEM -> Global Coverage -> COP-DEM_GLO-30-DGED`; 
+- Fiz zoom até ter +/- 150 Km para cada lado a partir do cromeleque, i.e. uma extensão de +/- 300 Km;
+- Mudei o ano inicial da pesquisa para 2001-01-01;
+- Cliquei em Search no fundo do painel;
+- Para cada resultado fiz download do ficheiro ZIP;
+- Descompactei todos os ZIP para uma pasta;
+- Copiei os TIFF localizados nas pastas `<pasta extraida do zip>/Copernicus_DSM_10_N38_00_W009_00/DEM` para uma outra pasta, e.g. pasta `rasters`;
+- No QGIS, em `Layer -> Add Layer -> Add Raster Layer` selecionei todos os TIFF da pasta `rasters` e pressionei `Add`;
+- No QGIS, em `Raster -> Miscellaneous -> Build Virtual Raster` configurei:
+    ```
+    Input layers: todos os GeoTIFF GLO-30
+    Place each input file into a separate band: desativado
+    Resolution: Average
+    Output: almendres_glo30.vrt
+    ```
+    ![Aspeto do VTR](images_readme/Screenshot%202026-07-29%20at%2014.16.58.png)
+- Para converter para GeoTIFF (compatível com **terrain4aAVR**), no QGIS, em `Raster -> Conversion -> Translate (Convert Format)` configurei:
+    ```
+    Input layer: almendres_glo30.vrt
+    Output file: almendres_glo30_merged.tif
+    ```
+    Nas opções de criação, em `Advanced Parameters -> Additional creation options`adicionei:
+    ```
+    COMPRESS=DEFLATE
+    TILED=YES
+    BIGTIFF=IF_SAFER
+    ``` 
+#### Preparar texturas
+- Usar apenas o Google Maps mostrou alguns problemas, nomeadamente *tiles* no mar que ficavam abranco:
+![](images_readme/Screenshot%202026-07-29%20at%2019.31.18.png)
+E também diferenças de coloração do terreno entre mosaicos;
+- Foi decido usar o Copernicus Sentinal-2 Mosaic. No Copernico Browser, painel de pesquisa, escolher`Sentinel Mosaics -> Sentinel-2 -> Quarterly Mosaics`;
+- Escolher 2001-01-01 como data de inicio da pesquisa e pressionar e clicar em Search;
+- Ir para `VISUALIZE`, selecionar a layer `True Color Cloudless`;
+- Na toolbox do lado direito clicar o icone do pentágono e criar uma área de interesse que cubra oquadrado vermelho do QGIS;
+![](images_readme/Screenshot%202026-07-29%20at%2020.37.37.png)
+- Na toolbox pressione o botão de download;
+- Vá para o separador `Analytical` e preencha com a configuração da imagem abaixo;
+![](images_readme/Screenshot%202026-07-29%20at%2020.40.44.png)
+- Pressione `DOWNLOAD`para guardar a imagem no disco;
+- Arraste o TIFF para o quadro de layers do QGIS.
 
+
+#### Criar terreno com terrain4aAVR
 - No `terrain4aAVR` use a seguinte configuração:
-    ![](images_readme/Screenshot%202026-07-29%20at%2014.45.55.png)
+    ![](images_readme/Screenshot%202026-07-29%20at%2020.57.31.png)
     Que corresponde aos seguintes layers:
-    ![](images_readme/Screenshot%202026-07-29%20at%2014.49.43.png)
+    ![](images_readme/Screenshot%202026-07-29%20at%2020.55.49.png)
+
+An error has occurred while executing Python code: 
+
+TypeError: arguments did not match any overloaded call:   QSize(): too many arguments   QSize(w: int, h: int): argument 1 has unexpected type 'float'   QSize(a0: QSize): argument 1 has unexpected type 'float' 
+Traceback (most recent call last):
+  File "/Users/rui/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/terrain4aAVR/terrain4aAVR.py", line 347, in run
+    self.main()
+  File "/Users/rui/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/terrain4aAVR/terrain4aAVR.py", line 882, in main
+    options.setOutputSize(QSize(self.L_dem_px / 3, self.L_dem_px / 3))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: arguments did not match any overloaded call:
+  QSize(): too many arguments
+  QSize(w: int, h: int): argument 1 has unexpected type 'float'
+  QSize(a0: QSize): argument 1 has unexpected type 'float'
+
+
+Python version: 3.12.11 (main, Jul  3 2026, 15:57:42) [Clang 17.0.0 (clang-1700.6.4.2)] 
+QGIS version: 3.44.12-Solothurn Solothurn, 32c5dba7 
+
+Python Path:
+/Applications/QGIS.app/Contents/Resources/qgis/python
+/Users/rui/Library/Application Support/QGIS/QGIS3/profiles/default/python
+/Users/rui/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins
+/Applications/QGIS.app/Contents/Resources/qgis/python/plugins
+/Applications/QGIS.app/Contents/Frameworks/lib/python312.zip
+/Applications/QGIS.app/Contents/Frameworks/lib/python3.12
+/Applications/QGIS.app/Contents/Frameworks/lib/python3.12/lib-dynload
+/Applications/QGIS.app/Contents/Frameworks/lib/python3.12/site-packages
+/Users/rui/Library/Application Support/QGIS/QGIS3/profiles/default/python
+/Users/rui/SynologyDrive/MEIM_OFFLINE/S4/TFM
+
 WORK IN PROGRESS
 
 
