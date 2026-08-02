@@ -76,26 +76,47 @@ Foram seguidas as instruções da secção **[Installation Instructions & Quick 
 ## Observações ao manual
 
 ### Secção 5-1
-- Os URLs corretos para usar na conexao XYZ Tiles para o GoogleMaps são:
+- Os URLs corretos para usar na ligação XYZ Tiles para o GoogleMaps são:
     - Google Satellite: `https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}`;
     - Google Hybrid: `https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}`;
     - Google Maps: `https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}`;
     - Google Terrain: `https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}`.
 
+Ver em [Alternativas de maps para textura](#alternativas-de-maps-para-texturas) como criar as ligações aos mapas.
+
 Os links da Jaxa referidos no manual estão desatualizados. Pedi ajuda ao ChatGPT. Este sugeriu usar dados da Direção Geral do Território e Copernicus GLO-30.
+
+#### Alternativas de maps para texturas
+
+O Google Maps pode ser usado para criação de texturas, o manual refere o Google Maps (secção 5-5) como layer para criação de texturas tanto para terreno amplo (Wide Terrain) como para terreno local (Narrow Terrain). No entanto existem outras alternativas:
+
+- Google Satellite: `https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}` (max. zoom 20);
+- Esri World Imagery: `https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}` (max. zoom 20).
+
+A ligação `XYZ Tiles` no QGIS deve ser feita da seguinte forma:
+- Clicar com o botão do lado direito em `XYZ Tiles` no painel `Browser`;
+- Escolher `New connection...`;
+- Preencher:
+    ```
+    Name: um nome para a ligação
+    URL: o URL para a o map
+    Max. Zoom Level: normalmente 20
+    ```
+
+Para usar a ligação como uma layer deve arrastar a ligação para o painel `Layers`.
 
 ### Tentativa de criação de um *terrain*
 
 Localização: `38.5575, -8.0614` (Cromeleque dos Almendres)
 
-- Instalei o plugin **DGT CDD Downloader** no QGIS;
-- Criei conta em https://cdd.dgterritorio.gov.pt/;
-- No QGIS, em `Project -> Properties... -> CRS` selecionei:
+- Instalar o plugin **DGT CDD Downloader** no QGIS;
+- Criar conta em https://cdd.dgterritorio.gov.pt/;
+- No QGIS, em `Project -> Properties... -> CRS` selecionar:
     ```
     ETRS89 / Portugal TM06
     EPSG:3763
     ```
-- No QGIS, em `Project -> Properties... -> General` confirmei:
+- No QGIS, em `Project -> Properties... -> General` confirmar:
     ```
     Units for distance: Meters
     Units for area: Square meters
@@ -104,22 +125,97 @@ Localização: `38.5575, -8.0614` (Cromeleque dos Almendres)
     
 - No QGIS, `Processing -> Toolbox`;
 - Procurar por `DGT CDD Portal`, expandir e clicar duas vezes em `DGT CDD Data Downloader`;
-- O objetivo neste teste é o Cromeleque dos Almendres. Defini no mapa (QGIS) na layer do GoogleMaps,uma área de +/- 10 Km à volda do cromeleque;
+- O objetivo neste teste é o Cromeleque dos Almendres. Definir no mapa (QGIS) na layer do GoogleMaps,uma área de +/- 10 Km à volda do cromeleque;
 ![](images_readme/Screenshot%202026-07-28%20at%2014.56.23.png)
-- Em `Area of Interest`escolhi `Use Current Map Canvas Extend`;
-- Em `Collections to download` escolhi `MDT-2m`;
+- Em `Area of Interest` escolher `Use Current Map Canvas Extend`;
+- Em `Collections to download` escolher `MDT-2m`;
+
+
+#### Ortofoto para textura local 
+
+Este passo é opcional, pode ser usado o Google Maps Satellite para a textura local. 
+
+- Abrir o plugin `Terrain4aAVR` e configurar:
+    ```
+    Lat,Lng: 38.5575, -8.0614 (para Cromeleque dos Almendres, outro ponto se for esse ocaso)
+    Em Narrow Terrain
+    DEM Layer: DGT_MDT-2m
+    Mesh (m): 2,0 
+    ```
+    Não feche a janela do plugin. Na janela do mapa aparece uma caixa verde. Essa caixa é calculada pelo `Terrain4aAVR` e servirá de referência para a escolha da área da ortofoto;
+- Ir a [https://www.dgterritorio.gov.pt/atividades/cartografia/cartografia-topografica/ortofotos/ortofotos-digitais](https://www.dgterritorio.gov.pt/atividades/cartografia/cartografia-topografica/ortofotos/ortofotos-digitais);
+- Na linha `25 cm | 2018 | Portugal Continental` copiar o URL do `Serviço WMTS;
+- No QGIS, ir a `Layer -> Add Layer -> Add WMS/WMTS Layer e depois `New`;
+- Preencher com:
+    ```
+    Name: DGT Ortofotos 2018
+    URL: endereço WMTS copiado da DGT
+    ```
+- Pressionar `OK` e depois `Connect`;
+- Selecionar a layer `Ortos2018-RGB` e pressionar `Add`;
+- Definir nas propriedades do projeto `CRS: EPSG:3763`;
+- Fazer zoom à área dos Almendres;
+- Em `Processing Toolbox -> Converte map to raster` configurar:
+    ```
+    Minimum extent to render: escolher uma caixa à volta do cromeleque usando a caixa verde como referência
+    Units per pixel: 1,0 ou 0,5
+    Layers to render: Ortos2018-RGB
+    output layer: ortofoto_almendres.tif
+    ```
+    Em `Units per pixel`, para um local com 8,2 Km a relação é:
+    - a 0,25 m: cerca de 32768 × 32768 pixels;
+    - a 0,5 m: cerca de 16384 × 16384;
+    - a 1 m: cerca de 8192 × 8192.
+
+#### Criar *Geoid*
+
+Para áreas que cubram apenas o território português pode se usado `GeodPT08` que é específico para Portugal.
+
+Para áreas que cubram outros territórios, como o oceano e Espanha, deve ser usado um geoid global, algo como o `EGM2008 1'`.
+- Entrar em [https://www.agisoft.com/downloads/geoids/](https://www.agisoft.com/downloads/geoids/);
+- Para portugal:
+Na secção **Portugal**, fazer download do [GeodPT08 geoid model](https://download.agisoft.com/gtg/pt_dgt_GeodPT08.tif);
+- Global:
+Na secção **Global Geoid Models**, fazer download do [EGM2008 1' geoid model](https://download.agisoft.com/gtg/us_nga_egm2008_1.tif);
+
+- No QGIS, `Layer -> Add Layer -> Add Raster Layers`e selecionar o ficheiro descarregado;
+
+#### Criar **mask**
+
+A mask é uma layer vetorial de polígonos que indica ao terrain4aAVR onde deve baixar o terreno para evitar interseção com o modelo 3D.
+
+Só ser criada depois de se saber qual é a área de terreno incluída no modelo Sketchfab.
+
+- No QGIS, `Layer -> Create Layer -> New GeoPackage Layer`;
+- Configurar:
+    ```
+    Database: almendres.gpkg
+    Table name: mask_almendres
+    Geometry type: Polygon
+    CRS: EPSG:3763
+    ```
+    Pressionar OK;
+- Usar a ortofoto como fundo e navegar até ao cromeleque;
+- Selecionar a layer `mask_almendres`;
+- Ativar `Toggle Editing` (o lápis na toolbar);
+- Clicar em `Add Polygon Feature` (terceiro ícone depois do lápis);
+- Desenhar um poligono em da área ocupada pelo modelo 3D. pode usar o preview do modelo no sketchfab como referência;
+- Usar o botão do lado direito para terminar a edição;
+- Gravar clicando na diskette ao lado do lápis e fazer `Toggle Editing`;
+
 #### Preparar o DEM amplo
-- Criei conta https://dataspace.copernicus.eu/ e selecionei `I am also interested in accessing Copernicus Contributing Missions data`;
-- Entrei no [Copernico Browser](https://browser.dataspace.copernicus.eu/?zoom=16&lat=38.5575&lng=-8.0614&themeId=DEFAULT-THEME&visualizationUrl=U2FsdGVkX1%2FUV8Ogx0%2Bj5XzGfgPa%2FZ%2F3HuiGFUIV3tI1RyokZFAy45fQT4aGMP1yBLBO%2Bp8SMuE6e18UWrmujAQSrd%2BBL5fX3qzbacdXWoj4BSzExH6es3cK3qpjmcSI&datasetId=S2_L2A_CDAS&demSource3D=%22MAPZEN%22&cloudCoverage=30&dateMode=SINGLE), inseri as coordenadas do cromeleque na caixa de pesquisa (38.5575, -8.0614);
-- No painel de pesquisa (do lado esquerdo), escolhi `Copernicus DEM -> Global Coverage -> COP-DEM_GLO-30-DGED`; 
-- Fiz zoom até ter +/- 150 Km para cada lado a partir do cromeleque, i.e. uma extensão de +/- 300 Km;
-- Mudei o ano inicial da pesquisa para 2001-01-01;
-- Cliquei em Search no fundo do painel;
-- Para cada resultado fiz download do ficheiro ZIP;
-- Descompactei todos os ZIP para uma pasta;
-- Copiei os TIFF localizados nas pastas `<pasta extraida do zip>/Copernicus_DSM_10_N38_00_W009_00/DEM` para uma outra pasta, e.g. pasta `rasters`;
-- No QGIS, em `Layer -> Add Layer -> Add Raster Layer` selecionei todos os TIFF da pasta `rasters` e pressionei `Add`;
-- No QGIS, em `Raster -> Miscellaneous -> Build Virtual Raster` configurei:
+- Criar conta https://dataspace.copernicus.eu/ e selecionar `I am also interested in accessing Copernicus Contributing Missions data`;
+
+- Entrar no [Copernico Browser](https://browser.dataspace.copernicus.eu/?zoom=16&lat=38.5575&lng=-8.0614&themeId=DEFAULT-THEME&visualizationUrl=U2FsdGVkX1%2FUV8Ogx0%2Bj5XzGfgPa%2FZ%2F3HuiGFUIV3tI1RyokZFAy45fQT4aGMP1yBLBO%2Bp8SMuE6e18UWrmujAQSrd%2BBL5fX3qzbacdXWoj4BSzExH6es3cK3qpjmcSI&datasetId=S2_L2A_CDAS&demSource3D=%22MAPZEN%22&cloudCoverage=30&dateMode=SINGLE), inserir as coordenadas do cromeleque na caixa de pesquisa (38.5575, -8.0614);
+- No painel de pesquisa (do lado esquerdo), escolher `Copernicus DEM -> Global Coverage -> COP-DEM_GLO-30-DGED`; 
+- Fazer zoom até ter +/- 150 Km para cada lado a partir do cromeleque, i.e. uma extensão de +/- 300 Km;
+- Mudar o ano inicial da pesquisa para 2001-01-01;
+- Clicar em Search no fundo do painel;
+- Para cada resultado fazer download do ficheiro ZIP;
+- Extrair todos os ZIP para uma pasta;
+- Copiar os TIFF localizados nas pastas `<pasta extraida do zip>/Copernicus_DSM_10_N38_00_W009_00/DEM` para uma outra pasta, e.g. pasta `rasters`;
+- No QGIS, em `Layer -> Add Layer -> Add Raster Layer` selecionar todos os TIFF da pasta `rasters` e pressionar `Add`;
+- No QGIS, em `Raster -> Miscellaneous -> Build Virtual Raster` configurar:
     ```
     Input layers: todos os GeoTIFF GLO-30
     Place each input file into a separate band: desativado
@@ -127,7 +223,7 @@ Localização: `38.5575, -8.0614` (Cromeleque dos Almendres)
     Output: almendres_glo30.vrt
     ```
     ![Aspeto do VTR](images_readme/Screenshot%202026-07-29%20at%2014.16.58.png)
-- Para converter para GeoTIFF (compatível com **terrain4aAVR**), no QGIS, em `Raster -> Conversion -> Translate (Convert Format)` configurei:
+- Para converter para GeoTIFF (compatível com **terrain4aAVR**), no QGIS, em `Raster -> Conversion -> Translate (Convert Format)` configurar:
     ```
     Input layer: almendres_glo30.vrt
     Output file: almendres_glo30_merged.tif
@@ -138,59 +234,141 @@ Localização: `38.5575, -8.0614` (Cromeleque dos Almendres)
     TILED=YES
     BIGTIFF=IF_SAFER
     ``` 
-#### Preparar texturas
-- Usar apenas o Google Maps mostrou alguns problemas, nomeadamente *tiles* no mar que ficavam abranco:
-![](images_readme/Screenshot%202026-07-29%20at%2019.31.18.png)
-E também diferenças de coloração do terreno entre mosaicos;
-- Foi decido usar o Copernicus Sentinal-2 Mosaic. No Copernico Browser, painel de pesquisa, escolher`Sentinel Mosaics -> Sentinel-2 -> Quarterly Mosaics`;
-- Escolher 2001-01-01 como data de inicio da pesquisa e pressionar e clicar em Search;
-- Ir para `VISUALIZE`, selecionar a layer `True Color Cloudless`;
-- Na toolbox do lado direito clicar o icone do pentágono e criar uma área de interesse que cubra oquadrado vermelho do QGIS;
-![](images_readme/Screenshot%202026-07-29%20at%2020.37.37.png)
-- Na toolbox pressione o botão de download;
-- Vá para o separador `Analytical` e preencha com a configuração da imagem abaixo;
-![](images_readme/Screenshot%202026-07-29%20at%2020.40.44.png)
-- Pressione `DOWNLOAD`para guardar a imagem no disco;
-- Arraste o TIFF para o quadro de layers do QGIS.
-
-
 #### Criar terreno com terrain4aAVR
-- No `terrain4aAVR` use a seguinte configuração:
-    ![](images_readme/Screenshot%202026-07-29%20at%2020.57.31.png)
-    Que corresponde aos seguintes layers:
-    ![](images_readme/Screenshot%202026-07-29%20at%2020.55.49.png)
 
+##### Correção de erro (obrigatório)
+
+A versão 3.44.12-Solothurn do QGIS dá este erro no final do processamento da versão atual do terrain4aAVR:
+```
 An error has occurred while executing Python code: 
-
-TypeError: arguments did not match any overloaded call:   QSize(): too many arguments   QSize(w: int, h: int): argument 1 has unexpected type 'float'   QSize(a0: QSize): argument 1 has unexpected type 'float' 
+TypeError: arguments did not match any overloaded call:   QSize(): too many arguments   QSize(w:  h:    int): argument 1 has unexpected type 'float'   QSize(a0: QSize): argument 1 has pected type 'float' 
 Traceback (most recent call last):
-  File "/Users/rui/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/terrain4aAVR/terrain4aAVR.py", line 347, in run
+  File "/Users/user/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/ain4aAVR/    terrain4aAVR.py", line 347, in run
     self.main()
-  File "/Users/rui/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/terrain4aAVR/terrain4aAVR.py", line 882, in main
+  File "/Users/user/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/ain4aAVR/    terrain4aAVR.py", line 882, in main
     options.setOutputSize(QSize(self.L_dem_px / 3, self.L_dem_px / 3))
                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 TypeError: arguments did not match any overloaded call:
   QSize(): too many arguments
   QSize(w: int, h: int): argument 1 has unexpected type 'float'
   QSize(a0: QSize): argument 1 has unexpected type 'float'
-
-
 Python version: 3.12.11 (main, Jul  3 2026, 15:57:42) [Clang 17.0.0 (clang-1700.6.4.2)] 
 QGIS version: 3.44.12-Solothurn Solothurn, 32c5dba7 
-
 Python Path:
 /Applications/QGIS.app/Contents/Resources/qgis/python
-/Users/rui/Library/Application Support/QGIS/QGIS3/profiles/default/python
-/Users/rui/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins
+/Users/user/Library/Application Support/QGIS/QGIS3/profiles/default/python
+/Users/user/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins
 /Applications/QGIS.app/Contents/Resources/qgis/python/plugins
 /Applications/QGIS.app/Contents/Frameworks/lib/python312.zip
 /Applications/QGIS.app/Contents/Frameworks/lib/python3.12
 /Applications/QGIS.app/Contents/Frameworks/lib/python3.12/lib-dynload
 /Applications/QGIS.app/Contents/Frameworks/lib/python3.12/site-packages
-/Users/rui/Library/Application Support/QGIS/QGIS3/profiles/default/python
-/Users/rui/SynologyDrive/MEIM_OFFLINE/S4/TFM
+/Users/user/Library/Application Support/QGIS/QGIS3/profiles/default/python
+/Users/user/SynologyDrive/MEIM_OFFLINE/S4/TFM
+```
+Este erro deve-se a divisões que resultam em `float` e esse valor está a ser usado em funções,  `QSize` que só aceitam `int`. Estes erros aparecem na versão 3.44.12-Solothurn do QGIS do à versão da workframe do QT que é usada. **Este problema deve ser resolvido**, pois impede a geração dos ficheiros JPG do terreno amplo.
 
-WORK IN PROGRESS
+Resolver o erro:
+- Cópia de segurança:
+```console
+cp "/Users/user/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/ain4aAVR/terrain4aAVR.py" \
+/Users/user/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/terrain4aAVR/ain4aAVR.py.bak"
+```
+- Editar `/Users/user/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/ain4aAVR/terrain4aAVR.py`
+- Na linha 882 alterar
+```python
+options.setOutputSize(QSize(self.L_dem_px / 3, self.L_dem_px / 3))
+```
+Para
+```python
+wide_texture_px = self.L_dem_px // 3
+options.setOutputSize(QSize(wide_texture_px, wide_texture_px))
+```
+- Procurar todas as ocorrências de `QSize(`
+- Ao encontrar
+```python
+options.setOutputSize(QSize(pxsize, pxsize))
+```
+Substituir a secção toda por
+```python
+pxsize = self.S_output_size / self.S_tex_mesh
+if pxsize > 16384:
+    pxsize = 16384
+pxsize = int(round(pxsize)) # new
+texlayer = QgsProject.instance().mapLayersByName(
+    "narrowTerrain_TEX"
+)[0]
+options = QgsMapSettings()
+options.setLayers([texlayer])
+options.setBackgroundColor(QColor(0, 0, 0))
+options.setOutputSize(QSize(pxsize, pxsize))
+```
+- Procurar por TILE_SIZE
+Ao encontrar
+```python
+parameters = {'EXTENT': area_rect, 'LAYERS': [uri], 'MAP_UNITS_PER_PIXEL': tex_mesh,
+                  'OUTPUT': 'TEMPORARY_OUTPUT', 'TILE_SIZE': width / tex_mesh}
+```
+Substituir por
+```python
+tile_size = int(round(width / tex_mesh))
+parameters = {'EXTENT': area_rect, 'LAYERS': [uri], 'MAP_UNITS_PER_PIXEL': tex_mesh,
+                  'OUTPUT': 'TEMPORARY_OUTPUT', 'TILE_SIZE': tile_size}
+```
+
+##### Criar terreno
+- No `terrain4aAVR` use a seguinte configuração:
+    ![](images_readme/Screenshot%202026-07-31%20at%2017.46.14.png)
+    
+- Pressione OK para gerar o terreno. Este processo demora algum tempo.
+
+Na textura do Narrow Terrain também pode ser usado o Google Maps. Neste caso em concreto do Cromeleque dos Almendres, existe uma mudança de tonalidade que não fica dada bem.
 
 
+#### Preencher dataset.txt
 
+Para saber o valor de altitude de uma layer, e.g. MDT, dev:
+1. Selecionar `Identify Feature` no QGIS (ícone com um i na barra de ferramentas superior);
+1. Selecionar a layer pretendida e clicar no local do mapa que pretende saber a altitude;
+1. Na caixa `Identify Results`(lado esquerdo), o valor do campo `Band 1` é a altitude. E.g. para o Cromleque dos Almendres, o valor MDT é $ \approxeq 412,3187$.
+
+- center
+    - Primeiro longitude e depois latitude
+    - O terceiro valor é a altura elipsoidal. Se não for usado layer geoid, este valor é a o valor da altitude do layer MDT, e.g. `DGT_MDT-2m`.
+    - Se foi usado geoid o valor é:
+        $$
+        h=H+N
+        $$
+    Em que $H$ é o valor da altura MDT e $N$ é o valor da altura da layer geoid. No caso do cromeleque dos Almendres os valores são:
+    $$412,32 + 55,38 = 467,7$$
+
+## Exportar modelo do Unity para FBX    
+
+Correção no Blender
+
+No Blender:
+
+- Importar o GLB.
+- Selecionar todas as partes do modelo, em Scene Collection, botão do lado direito e `Select hierarchy`;
+- Object -> Set Origin -> Origin to Geometry
+- Colocar o modelo próximo de:
+    ```
+    X = 0
+    Y = 0
+    Z = 0
+    ```
+- Aplicar as transformações, `Object -> Apply -> All Transforms`
+- Confirmar que:
+    ```
+    Scale = 1,1,1
+    Rotation = 0,0,0
+    ```
+- Exporta para FBX, usando unidades métricas.
+
+    No Blender, o eixo vertical é Z; no Unity é Y. Na exportação FBX, normalmente deve usar:
+    ```
+    Forward: -Z Forward
+    Up: Y Up
+    Apply Transform: ativo
+    ```
+- Deverá ser necessário fazer ajustes depois do objeto importado para o `arcAstroVR`.
