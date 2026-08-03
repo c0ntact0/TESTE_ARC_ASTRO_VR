@@ -133,7 +133,7 @@ Localização: `38.5575, -8.0614` (Cromeleque dos Almendres)
 
 #### Ortofoto para textura local 
 
-Este passo é opcional, pode ser usado o Google Maps Satellite para a textura local. 
+Este passo é opcional, pode ser usado o Google Maps Satellite ou o Esri World Imagery para a textura local. 
 
 - Abrir o plugin `Terrain4aAVR` e configurar:
     ```
@@ -184,7 +184,7 @@ Na secção **Global Geoid Models**, fazer download do [EGM2008 1' geoid model](
 
 A mask é uma layer vetorial de polígonos que indica ao terrain4aAVR onde deve baixar o terreno para evitar interseção com o modelo 3D.
 
-Só ser criada depois de se saber qual é a área de terreno incluída no modelo Sketchfab.
+Só deve ser criada depois de se saber qual é a área de terreno incluída no modelo Sketchfab.
 
 - No QGIS, `Layer -> Create Layer -> New GeoPackage Layer`;
 - Configurar:
@@ -195,7 +195,7 @@ Só ser criada depois de se saber qual é a área de terreno incluída no modelo
     CRS: EPSG:3763
     ```
     Pressionar OK;
-- Usar a ortofoto como fundo e navegar até ao cromeleque;
+- Usar a ortofoto (ou o Google Maps ou o Esri World Imagery) como fundo e navegar até ao cromeleque;
 - Selecionar a layer `mask_almendres`;
 - Ativar `Toggle Editing` (o lápis na toolbar);
 - Clicar em `Add Polygon Feature` (terceiro ícone depois do lápis);
@@ -228,7 +228,7 @@ Só ser criada depois de se saber qual é a área de terreno incluída no modelo
     Input layer: almendres_glo30.vrt
     Output file: almendres_glo30_merged.tif
     ```
-    Nas opções de criação, em `Advanced Parameters -> Additional creation options`adicionei:
+    Nas opções de criação, em `Advanced Parameters -> Additional creation options` adicionar:
     ```
     COMPRESS=DEFLATE
     TILED=YES
@@ -266,63 +266,99 @@ Python Path:
 /Users/user/Library/Application Support/QGIS/QGIS3/profiles/default/python
 /Users/user/SynologyDrive/MEIM_OFFLINE/S4/TFM
 ```
-Este erro deve-se a divisões que resultam em `float` e esse valor está a ser usado em funções,  `QSize` que só aceitam `int`. Estes erros aparecem na versão 3.44.12-Solothurn do QGIS do à versão da workframe do QT que é usada. **Este problema deve ser resolvido**, pois impede a geração dos ficheiros JPG do terreno amplo.
+Este erro deve-se a divisões que resultam em `float`. Esses valores estão a ser usados em funções  `QSize` que só aceitam `int`. Estes erros aparecem na versão 3.44.12-Solothurn do QGIS devido à versão da workframe do QT que é usada. **Este problema deve ser resolvido**, pois impede a geração dos ficheiros JPG do terreno amplo.
 
 Resolver o erro:
 - Cópia de segurança:
-```console
-cp "/Users/user/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/ain4aAVR/terrain4aAVR.py" \
-/Users/user/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/terrain4aAVR/ain4aAVR.py.bak"
-```
+    ```console
+    cp "/Users/user/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/ain4aAVR/terrain4aAVR.py" "/Users/user/Library/  Application Support/QGIS/QGIS3/profiles/default/python/plugins/terrain4aAVR/ain4aAVR.py.bak"
+    ```
 - Editar `/Users/user/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/ain4aAVR/terrain4aAVR.py`
 - Na linha 882 alterar
-```python
-options.setOutputSize(QSize(self.L_dem_px / 3, self.L_dem_px / 3))
-```
-Para
-```python
-wide_texture_px = self.L_dem_px // 3
-options.setOutputSize(QSize(wide_texture_px, wide_texture_px))
-```
+    ```python
+    options.setOutputSize(QSize(self.L_dem_px / 3, self.L_dem_px / 3))
+    ```
+    Para
+    ```python
+    wide_texture_px = self.L_dem_px // 3
+    options.setOutputSize(QSize(wide_texture_px, wide_texture_px))
+    ```
 - Procurar todas as ocorrências de `QSize(`
 - Ao encontrar
-```python
-options.setOutputSize(QSize(pxsize, pxsize))
-```
-Substituir a secção toda por
-```python
-pxsize = self.S_output_size / self.S_tex_mesh
-if pxsize > 16384:
-    pxsize = 16384
-pxsize = int(round(pxsize)) # new
-texlayer = QgsProject.instance().mapLayersByName(
-    "narrowTerrain_TEX"
-)[0]
-options = QgsMapSettings()
-options.setLayers([texlayer])
-options.setBackgroundColor(QColor(0, 0, 0))
-options.setOutputSize(QSize(pxsize, pxsize))
-```
+    ```python
+    options.setOutputSize(QSize(pxsize, pxsize))
+    ```
+    Substituir a secção toda por
+    ```python
+    pxsize = self.S_output_size / self.S_tex_mesh
+    if pxsize > 16384:
+        pxsize = 16384
+    pxsize = int(round(pxsize)) # new
+    texlayer = QgsProject.instance().mapLayersByName(
+        "narrowTerrain_TEX"
+    )[0]
+    options = QgsMapSettings()
+    options.setLayers([texlayer])
+    options.setBackgroundColor(QColor(0, 0, 0))
+    options.setOutputSize(QSize(pxsize, pxsize))
+    ```
 - Procurar por TILE_SIZE
-Ao encontrar
-```python
-parameters = {'EXTENT': area_rect, 'LAYERS': [uri], 'MAP_UNITS_PER_PIXEL': tex_mesh,
-                  'OUTPUT': 'TEMPORARY_OUTPUT', 'TILE_SIZE': width / tex_mesh}
-```
-Substituir por
-```python
-tile_size = int(round(width / tex_mesh))
-parameters = {'EXTENT': area_rect, 'LAYERS': [uri], 'MAP_UNITS_PER_PIXEL': tex_mesh,
-                  'OUTPUT': 'TEMPORARY_OUTPUT', 'TILE_SIZE': tile_size}
-```
+    Ao encontrar
+    ```python
+    parameters = {'EXTENT': area_rect, 'LAYERS': [uri], 'MAP_UNITS_PER_PIXEL': tex_mesh,
+                      'OUTPUT': 'TEMPORARY_OUTPUT', 'TILE_SIZE': width / tex_mesh}
+    ```
+    Substituir por
+    ```python
+    tile_size = int(round(width / tex_mesh))
+    parameters = {'EXTENT': area_rect, 'LAYERS': [uri], 'MAP_UNITS_PER_PIXEL': tex_mesh,
+                      'OUTPUT': 'TEMPORARY_OUTPUT', 'TILE_SIZE': tile_size}
+    ```
+
+O QGIS deve ser reiniciado para que as modificações tenham efeito.
+
+##### Outras modificações ao código (opcional)
+
+- Por omissão a depressão causada pela *mask* no terreno é de 3 metros. Este valor é muito alto e gera fossos profundos em situações em que o modelo não pode ser posicionado de forma a cobrir esses fossos. Uma forma de contornar este problema é gerar *masks* mais pequenas, o que pode não ser possível se o modelo contém objetos importantes nas extremidades. Outra forma é reduzir a profundidade da depressão. Isso pode ser alcançado com a variável `self.down`:
+Em vez de
+    ```python
+    self.down: float = 3
+    ```
+    Usar, por exemplo
+    ```python
+    self.down: float = 1
+    ```
+- Na linha
+    ```python
+    self.dlg.mQgsFileWidget_outputPath.setFilePath(os.path.expanduser('~/Desktop'))
+    ```
+    O caminho `~/Desktop` pode ser substituido por outro. Assim evita-se estar sempre a mudar o caminho quando se chama o plugin.
+
+O QGIS deve ser reiniciado para que as modificações tenham efeito.
 
 ##### Criar terreno
 - No `terrain4aAVR` use a seguinte configuração:
-    ![](images_readme/Screenshot%202026-07-31%20at%2017.46.14.png)
-    
+
+
+    ```
+    Lat, Lng: 38.5575,-8.0614
+
+    Wide Terrain
+    DEM layer: wide_almendres_glo30_merged
+    Geoid layer: us_nga_egm2008_1
+    Texture layer: GoggleMaps (Satellite)
+
+    Narrow Terrain
+    DEM layer: DGT_MDT-2m
+    Geoid layer: us_nga_egm2008_1
+    Texture layer: ortofoto_almendres
+    Mesh (m): 2,0
+
+    Mask Layer: mask_almendres (Fill Value entre 5-2 metros. Por omissão são 5 metros)
+    ```    
 - Pressione OK para gerar o terreno. Este processo demora algum tempo.
 
-Na textura do Narrow Terrain também pode ser usado o Google Maps. Neste caso em concreto do Cromeleque dos Almendres, existe uma mudança de tonalidade que não fica dada bem.
+Na textura do Narrow Terrain também pode ser usado o Google Maps. Neste caso em concreto do Cromeleque dos Almendres, existe uma mudança de tonalidade que não fica dada bem. Também pode ser usado o Esri World Imagery para as duas texturas.
 
 
 #### Preencher dataset.txt
@@ -350,7 +386,8 @@ No Blender:
 
 - Importar o GLB.
 - Selecionar todas as partes do modelo, em Scene Collection, botão do lado direito e `Select hierarchy`;
-- Object -> Set Origin -> Origin to Geometry
+- Object -> Set Origin -> Origin to Geometry;
+- Pode usar `Numpad 7`para top view e `Numpad 3`para vista lateral. `Numpad 5` alterna entre vista ortografica e vista de perspetiva;
 - Colocar o modelo próximo de:
     ```
     X = 0
@@ -363,12 +400,16 @@ No Blender:
     Scale = 1,1,1
     Rotation = 0,0,0
     ```
-- Exporta para FBX, usando unidades métricas.
 
+- Exporta para FBX, usando unidades métricas.
     No Blender, o eixo vertical é Z; no Unity é Y. Na exportação FBX, normalmente deve usar:
     ```
+    Selected Objects: ativo
+    Apply Transform: ativo
     Forward: -Z Forward
     Up: Y Up
-    Apply Transform: ativo
+    Apply Scalings: FBX Units Scale
+    Path Mode: Copy
+    Embed Textures: ativo
     ```
 - Deverá ser necessário fazer ajustes depois do objeto importado para o `arcAstroVR`.
