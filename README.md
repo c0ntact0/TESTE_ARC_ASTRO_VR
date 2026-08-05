@@ -380,8 +380,6 @@ Para saber o valor de altitude de uma layer, e.g. MDT, dev:
 
 ## Exportar modelo para FBX    
 
-Correção no Blender
-
 No Blender:
 
 - Importar o GLB.
