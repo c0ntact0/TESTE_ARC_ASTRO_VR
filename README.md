@@ -1,10 +1,10 @@
 # Testes arcAstroVR (Source code)
 
-Versão Unity: 6000.4.7f1
-Versão Stellarium: 26.2
-OS: MacOS Sequoia 15.7.7
-CPU: Apple M2 Pro
-RAM: 16 GB
+Versão Unity: 6000.4.7f1  
+Versão Stellarium: 26.2  
+OS: MacOS Sequoia 15.7.7  
+CPU: Apple M2 Pro  
+RAM: 16 GB  
 
 
 ## Preparação
@@ -378,7 +378,7 @@ Para saber o valor de altitude de uma layer, e.g. MDT, dev:
     Em que $H$ é o valor da altura MDT e $N$ é o valor da altura da layer geoid. No caso do cromeleque dos Almendres os valores são:
     $$412,32 + 55,38 = 467,7$$
 
-## Exportar modelo do Unity para FBX    
+## Exportar modelo para FBX    
 
 Correção no Blender
 
