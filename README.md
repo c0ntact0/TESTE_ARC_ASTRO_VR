@@ -427,7 +427,7 @@ Cromeleque da Portela de Mogos: `38.62645627525851, -8.025696353431758`
 
 # Orientação dos monumentos
 
-Quando os monumentos estão cobertos por estruturas artificiais ou naturais, torna-se muito difícil orientar e escalar os modelos 3D usando somente imagens de satélite. Para orientar e escalar os modelos de forma precisa, é necessário obter dados no terreno ou documentação que possa ser usada para esse fim. Para já, tenho pesquisado algumas fontes que podem ser úteis para este trabalho. A orientação e escala do Cromeleque da Portela de Mogos, é impossível através de imagens de satélite, pois o conjunto megalitico encontra-se localizado entre sobreiros, cujas as copas ocultam o monumento visto de cima. Documento aqui dois links, que encontrei e que podem ser úteis, não só para resolver este problema sem ser necessário ir ao local, como para estudo posterior:
+Quando os monumentos estão cobertos por estruturas artificiais ou naturais, torna-se muito difícil orientar e escalar os modelos 3D usando somente imagens de satélite. Para orientar e escalar os modelos de forma precisa, é necessário obter dados no terreno ou documentação que possa ser usada para esse fim. Para já, tenho pesquisado algumas fontes que podem ser úteis para este trabalho. A orientação e escala do Cromeleque da Portela de Mogos, é impossível através de imagens de satélite, pois o conjunto megalitico encontra-se localizado entre sobreiros, cujas as copas ocultam o monumento visto de cima. Documento aqui alguns links que encontrei e que podem ser úteis, não só para resolver este problema sem ser necessário ir ao local, como para estudo posterior:
 
 - [The Megalithic Portal](https://www.megalithic.co.uk/article.php?sid=14608)
 - [Mário Varela Gomes](https://fcsh-unl.academia.edu/MarioVarelaGomes)
@@ -437,3 +437,5 @@ O vídeo que pode ser visto em [The Megalithic Portal](https://www.megalithic.co
 ![](images_readme/Screenshot%202026-08-07%20at%2017.31.02.png)
 
 A escala também é representada, o que ajuda no escalamento do modelo.
+
+WORK IN PROGRESS
