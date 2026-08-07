@@ -435,3 +435,5 @@ Quando os monumentos estão cobertos por estruturas artificiais ou naturais, tor
 
 O vídeo que pode ser visto em [The Megalithic Portal](https://www.megalithic.co.uk/article.php?sid=14608) e em [Prehistoric Portugal](https://prehistoricportugal.com/cromeleque-da-portela-de-mogos/) tem uma versão do diagrama do Cromeleque da Portela de Mogos, criado por Mário Varela Gomes, com a orientação do monumento:
 ![](images_readme/Screenshot%202026-08-07%20at%2017.31.02.png)
+
+A escala também é representada, o que ajuda no escalamento do modelo.
