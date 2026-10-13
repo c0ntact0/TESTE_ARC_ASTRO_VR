@@ -70,6 +70,28 @@ Foram seguidas as instruções da secção **[Installation Instructions & Quick 
 - O software funciona corretamente e faz a leitura dinâmica das Skyboxes;
 - O sistema de datasets pareceu-me uma boa forma de generalizar as localizações.
 
+## Teclas F1 a F12, memórias para Skyboxes
+
+As teclas F1 a F12 servem para selecionar memórias (_slots_) para gravar Skyboxes. Em MacOS essas Skyboxes são guardadas em `~/Library/Application Support/Stellarium`, em pastas com nome correspondente à tecla, i.e. f1, f2, f3,...
+Juntamente com as imagens da Skybox é guardado um ficheiro `unityData.txt` que contém metadata. Ente esta metadata está a data configurada no arcAstroVR.
+
+## Outros atalhos
+
+Fonte: https://github.com/arcAstroVR/arcAstroVR/blob/master/Assets/arcAstroVR/Script/aAV_StelKeyboardTriggers.cs
+
+- T: Show Atmosphere
+- Q: Show Cardinal Points
+- E: Show Equatorial Grid
+- Z: Show Azimuthal Grid
+- P: Show Planets Labels
+- U: Show Archaeo Lines
+- C: Show Constellation Lines
+- V: Show Constellation Labels
+- R: Show Constellation Art
+
+A restante referência do teclado pode ser consultada no final da secção:
+https://github.com/arcAstroVR/arcAstroVR/tree/master#installation-instructions--quick-start
+
 # Teste terrain4aAVR/QGIS
 
 ## Observações ao manual
